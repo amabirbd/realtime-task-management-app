@@ -175,25 +175,46 @@ cd apps/web && npm run dev
 3. **Deploy Backend:**
    - Add a new service from your GitHub repo
    - Set the root directory to `apps/api`
+   - Railway will use `apps/api/railway.json`
+   - Build command: `npm install && npm run build`
+   - Start command: `npm start`
    - Add environment variables:
+     - `DATABASE_URL` - from the Railway PostgreSQL plugin
      - `JWT_ACCESS_SECRET` - generate a random string
      - `JWT_REFRESH_SECRET` - generate a different random string
      - `CLOUDINARY_CLOUD_NAME`
      - `CLOUDINARY_API_KEY`
      - `CLOUDINARY_API_SECRET`
      - `CLIENT_URL` - your frontend URL
+     - `NODE_ENV` - `production`
 
 4. **Deploy Frontend:**
    - Add another service from the same repo
    - Set the root directory to `apps/web`
+   - Railway will use `apps/web/railway.json`
+   - Build command: `npm install && npm run build`
+   - Start command: `npm start`
    - Add environment variables:
      - `NEXT_PUBLIC_API_URL` - your backend URL + `/api/v1`
      - `NEXT_PUBLIC_SOCKET_URL` - your backend URL
 
 5. **Seed the database:**
    ```bash
+   railway run --service api npx prisma db push
    railway run --service api npx prisma db seed
    ```
+
+6. **Update production URLs after both services deploy:**
+   - Backend `CLIENT_URL` must exactly match the frontend Railway URL
+   - Frontend `NEXT_PUBLIC_API_URL` must be `https://your-api.railway.app/api/v1`
+   - Frontend `NEXT_PUBLIC_SOCKET_URL` must be `https://your-api.railway.app`
+   - Redeploy both services after changing environment variables
+
+7. **Verify deployment:**
+   - API health: `https://your-api.railway.app/health`
+   - API docs: `https://your-api.railway.app/api/docs`
+   - Frontend: `https://your-frontend.railway.app`
+   - Test login, realtime updates, and Workspace Docs collaboration
 
 ## 🔐 Authentication
 
