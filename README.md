@@ -178,6 +178,7 @@ cd apps/web && npm run dev
    - Railway will use `apps/api/railway.json`
    - Build command: `npm install && npm run build`
    - Start command: `npm start`
+   - Pre-deploy command: `npm run deploy:db --workspace=@fredocloud/api`
    - Add environment variables:
      - `DATABASE_URL` - from the Railway PostgreSQL plugin
      - `JWT_ACCESS_SECRET` - generate a random string
@@ -200,8 +201,7 @@ cd apps/web && npm run dev
 
 5. **Seed the database:**
    ```bash
-   railway run --service api npx prisma db push
-   railway run --service api npx prisma db seed
+   railway run --service api npm run deploy:db --workspace=@fredocloud/api
    ```
 
 6. **Update production URLs after both services deploy:**

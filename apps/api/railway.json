@@ -4,6 +4,7 @@
     "buildCommand": "npm ci && npm run build --workspace=@fredocloud/api"
   },
   "deploy": {
+    "preDeployCommand": "npm run deploy:db --workspace=@fredocloud/api",
     "startCommand": "npm start --workspace=@fredocloud/api",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300,
