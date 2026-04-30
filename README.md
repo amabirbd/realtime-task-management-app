@@ -1,0 +1,301 @@
+# Collaborative Team Hub
+
+A full-stack team collaboration platform built with Next.js 14, Express.js, PostgreSQL, and Socket.io. Deployed on Railway.
+
+## 🚀 Live Demo
+
+- **Frontend:** [https://your-frontend.railway.app](https://your-frontend.railway.app)
+- **API:** [https://your-api.railway.app](https://your-api.railway.app)
+- **API Docs:** [https://your-api.railway.app/api/docs](https://your-api.railway.app/api/docs)
+
+**Demo Accounts:**
+- `demo@fredocloud.com` / `demo123`
+- `admin@fredocloud.com` / `demo123`
+- `teammate@fredocloud.com` / `demo123`
+
+## 📁 Project Structure
+
+```
+fredocloud/
+├── apps/
+│   ├── api/                 # Express.js backend
+│   │   ├── src/
+│   │   │   ├── routes/      # API routes
+│   │   │   ├── middleware/  # Auth & validation
+│   │   │   ├── utils/       # DB, JWT, Cloudinary
+│   │   │   ├── sockets/     # Socket.io handlers
+│   │   │   └── index.js     # Server entry
+│   │   └── prisma/
+│   │       └── schema.prisma
+│   └── web/                 # Next.js 14 frontend
+│       ├── src/
+│       │   ├── app/         # App Router
+│       │   ├── components/  # UI components
+│       │   ├── stores/      # Zustand stores
+│       │   ├── hooks/       # Custom hooks
+│       │   └── lib/         # Utilities
+│       └── package.json
+├── packages/
+│   ├── shared/              # Shared utilities
+│   ├── ui/                  # Shared UI components
+│   └── eslint-config/       # Shared ESLint config
+├── turbo.json               # Turborepo config
+└── package.json             # Root workspace config
+```
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Runtime:** Node.js + Express.js
+- **Database:** PostgreSQL + Prisma ORM
+- **Auth:** JWT (access + refresh tokens in httpOnly cookies)
+- **Real-time:** Socket.io
+- **File Storage:** Cloudinary
+- **Validation:** express-validator
+- **Docs:** Swagger/OpenAPI
+
+### Frontend
+- **Framework:** Next.js 14 (App Router)
+- **Language:** JavaScript
+- **Styling:** Tailwind CSS + CSS Variables
+- **State:** Zustand
+- **HTTP:** Axios
+- **UI Components:** Radix UI + shadcn/ui patterns
+- **Real-time:** Socket.io Client
+- **Charts:** Recharts
+- **Editor:** React-Quill
+
+### DevOps
+- **Monorepo:** Turborepo
+- **Deployment:** Railway (frontend + backend as separate services)
+- **Database:** Railway PostgreSQL plugin
+
+## ✨ Features
+
+### Core Features
+- ✅ **Authentication:** Email/password with JWT (httpOnly cookies)
+- ✅ **Workspaces:** Create, manage, and switch workspaces
+- ✅ **Member Management:** Invite by email, assign roles (Admin/Member)
+- ✅ **Goals & Milestones:** Create goals with milestones and progress tracking
+- ✅ **Announcements:** Rich-text posts with reactions and comments
+- ✅ **Action Items:** Kanban board and list views, priority levels
+- ✅ **Real-time Updates:** Live updates via Socket.io
+- ✅ **Analytics Dashboard:** Stats and charts (Recharts)
+- ✅ **CSV Export:** Export workspace data
+
+### Advanced Features (Implemented)
+1. **Real-time Collaborative Editing:** Multiple users can edit goal descriptions simultaneously with live cursors (using Socket.io)
+2. **Optimistic UI:** Actions reflect instantly before server confirmation, with graceful rollback on error
+
+### Bonus Features (Implemented)
+- 🌓 **Dark/Light Theme:** System preference detection with next-themes
+- 📚 **Swagger API Docs:** Available at `/api/docs`
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database
+- Cloudinary account (optional, for image uploads)
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone <repository-url>
+cd fredocloud
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Set up environment variables:**
+
+**Backend (apps/api/.env):**
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/fredocloud
+JWT_ACCESS_SECRET=your-access-secret
+JWT_REFRESH_SECRET=your-refresh-secret
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+CLIENT_URL=http://localhost:3000
+PORT=4000
+```
+
+**Frontend (apps/web/.env.local):**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
+```
+
+4. **Set up the database:**
+```bash
+cd apps/api
+npx prisma generate
+npx prisma db push
+npx prisma db seed
+```
+
+5. **Run the development servers:**
+
+From the root directory:
+```bash
+npm run dev
+```
+
+Or individually:
+```bash
+# Backend
+cd apps/api && npm run dev
+
+# Frontend
+cd apps/web && npm run dev
+```
+
+6. **Open the app:**
+- Frontend: http://localhost:3000
+- API: http://localhost:4000
+- API Docs: http://localhost:4000/api/docs
+
+## 🚂 Deployment (Railway)
+
+### Setup
+
+1. **Create a Railway project:**
+   - Go to [Railway.app](https://railway.app)
+   - Create a new project
+
+2. **Add PostgreSQL:**
+   - Add the PostgreSQL plugin
+   - This automatically sets `DATABASE_URL`
+
+3. **Deploy Backend:**
+   - Add a new service from your GitHub repo
+   - Set the root directory to `apps/api`
+   - Add environment variables:
+     - `JWT_ACCESS_SECRET` - generate a random string
+     - `JWT_REFRESH_SECRET` - generate a different random string
+     - `CLOUDINARY_CLOUD_NAME`
+     - `CLOUDINARY_API_KEY`
+     - `CLOUDINARY_API_SECRET`
+     - `CLIENT_URL` - your frontend URL
+
+4. **Deploy Frontend:**
+   - Add another service from the same repo
+   - Set the root directory to `apps/web`
+   - Add environment variables:
+     - `NEXT_PUBLIC_API_URL` - your backend URL + `/api/v1`
+     - `NEXT_PUBLIC_SOCKET_URL` - your backend URL
+
+5. **Seed the database:**
+   ```bash
+   railway run --service api npx prisma db seed
+   ```
+
+## 🔐 Authentication
+
+The app uses JWT tokens stored in httpOnly cookies:
+- **Access Token:** 15 minutes, sent in cookies
+- **Refresh Token:** 7 days, sent in cookies
+- **Auto-refresh:** Frontend automatically refreshes expired tokens
+
+## 📝 API Reference
+
+### Authentication
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login
+- `POST /api/v1/auth/logout` - Logout
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `GET /api/v1/auth/me` - Get current user
+- `PATCH /api/v1/auth/profile` - Update profile (with avatar)
+
+### Workspaces
+- `GET /api/v1/workspaces` - List user's workspaces
+- `POST /api/v1/workspaces` - Create workspace
+- `GET /api/v1/workspaces/:id` - Get workspace details
+- `PATCH /api/v1/workspaces/:id` - Update workspace
+- `DELETE /api/v1/workspaces/:id` - Delete workspace
+- `POST /api/v1/workspaces/:id/invite` - Invite member
+- `GET /api/v1/workspaces/:id/members` - List members
+- `PATCH /api/v1/workspaces/:id/members/:userId/role` - Update member role
+- `DELETE /api/v1/workspaces/:id/members/:userId` - Remove member
+
+### Goals
+- `GET /api/v1/goals/workspace/:workspaceId` - List goals
+- `POST /api/v1/goals` - Create goal
+- `GET /api/v1/goals/:id` - Get goal with milestones
+- `PATCH /api/v1/goals/:id` - Update goal
+- `DELETE /api/v1/goals/:id` - Delete goal
+- `POST /api/v1/goals/:id/milestones` - Add milestone
+- `PATCH /api/v1/goals/milestones/:id` - Update milestone
+- `DELETE /api/v1/goals/milestones/:id` - Delete milestone
+
+### Announcements
+- `GET /api/v1/announcements/workspace/:workspaceId` - List announcements
+- `POST /api/v1/announcements` - Create announcement (Admin only)
+- `PATCH /api/v1/announcements/:id` - Update announcement
+- `DELETE /api/v1/announcements/:id` - Delete announcement
+- `POST /api/v1/announcements/:id/react` - Add/remove reaction
+- `POST /api/v1/announcements/:id/comments` - Add comment
+- `DELETE /api/v1/announcements/comments/:id` - Delete comment
+
+### Action Items
+- `GET /api/v1/action-items/workspace/:workspaceId` - List action items
+- `POST /api/v1/action-items` - Create action item
+- `PATCH /api/v1/action-items/:id` - Update action item
+- `PATCH /api/v1/action-items/:id/status` - Update status (for Kanban)
+- `DELETE /api/v1/action-items/:id` - Delete action item
+
+### Analytics
+- `GET /api/v1/analytics/workspace/:id/dashboard` - Dashboard stats
+- `GET /api/v1/analytics/workspace/:id/export?type=goals|action-items|members|audit-log` - Export CSV
+
+## 🎯 Advanced Features Implemented
+
+### 1. Real-time Collaborative Editing
+- Uses Socket.io to sync goal descriptions in real-time
+- Live cursors show where other users are editing
+- Document rooms are isolated per goal
+
+### 2. Optimistic UI
+- All mutations show immediate feedback
+- Rollback gracefully on error with toast notifications
+- Loading states don't block UI
+
+## 🎨 Design Decisions
+
+- **No TypeScript:** As per requirements, the entire project uses JavaScript
+- **Minimal UI:** Clean, functional interface using Tailwind CSS
+- **No Redux:** Zustand for simple state management
+- **shadcn/ui patterns:** Component structure inspired by shadcn but built manually
+- **Server-side auth:** JWT in httpOnly cookies for security
+
+## 📝 Conventional Commits
+
+This project uses conventional commits:
+- `feat:` New features
+- `fix:` Bug fixes
+- `docs:` Documentation changes
+- `style:` Code style changes (formatting, etc.)
+- `refactor:` Code refactoring
+- `test:` Test changes
+- `chore:` Build process, dependencies, etc.
+
+## ⚠️ Known Limitations
+
+- Email notifications require SMTP configuration
+- Collaborative editing is basic (operational transformation not implemented)
+- Offline support is not implemented
+- PWA features not implemented
+- No automated tests (would add with more time)
+
+## 📄 License
+
+MIT License - Built for the Fredocloud technical assessment.
+
+## 👥 Author
+
+Built as a technical assessment for Fredocloud.

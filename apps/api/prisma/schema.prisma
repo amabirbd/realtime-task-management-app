@@ -1,0 +1,248 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  ownedWorkspaces   Workspace[]       @relation("WorkspaceOwner")
+  memberships       WorkspaceMember[]
+  goals             Goal[]            @relation("GoalOwner")
+  announcements     Announcement[]
+  comments          Comment[]
+  actionItems       ActionItem[]      @relation("ActionItemAssignee")
+  notifications     Notification[]
+  reactions         Reaction[]
+  activityLogs      ActivityLog[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  accentColor   String    @default("#3b82f6")
+  ownerId       String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  owner       User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     WorkspaceMember[]
+  goals       Goal[]
+  announcements Announcement[]
+  actionItems ActionItem[]
+  auditLogs   AuditLog[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime  @default(now())
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@map("workspace_members")
+}
+
+enum WorkspaceRole {
+  ADMIN
+  MEMBER
+}
+
+model Goal {
+  id            String      @id @default(cuid())
+  workspaceId   String
+  title         String
+  description   String?
+  ownerId       String
+  dueDate       DateTime?
+  status        GoalStatus  @default(ACTIVE)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  owner       User          @relation("GoalOwner", fields: [ownerId], references: [id])
+  milestones  Milestone[]
+  actionItems ActionItem[]
+  activityLogs ActivityLog[]
+
+  @@map("goals")
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+model Milestone {
+  id              String    @id @default(cuid())
+  goalId          String
+  title           String
+  progressPercent Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@map("milestones")
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  workspaceId String
+  authorId    String
+  content     String
+  isPinned    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id])
+  reactions Reaction[]
+  comments  Comment[]
+
+  @@map("announcements")
+}
+
+model Reaction {
+  id            String    @id @default(cuid())
+  announcementId String
+  userId        String
+  emoji         String
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId, emoji])
+  @@map("reactions")
+}
+
+model Comment {
+  id            String    @id @default(cuid())
+  announcementId String
+  authorId      String
+  content       String
+  mentions      String[]  // Array of user IDs mentioned
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  author       User         @relation(fields: [authorId], references: [id])
+
+  @@map("comments")
+}
+
+model ActionItem {
+  id          String           @id @default(cuid())
+  workspaceId String
+  goalId      String?
+  title       String
+  assigneeId  String?
+  priority    Priority           @default(MEDIUM)
+  dueDate     DateTime?
+  status      ActionItemStatus   @default(TODO)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  goal      Goal?     @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  assignee  User?     @relation("ActionItemAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@map("action_items")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ActionItemStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  content   String
+  link      String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  MENTION
+  INVITE
+  ASSIGNMENT
+  GOAL_UPDATE
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  goalId    String
+  userId    String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("activity_logs")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  userId      String?
+  action      String
+  entityType  String
+  entityId    String
+  oldValue    String?
+  newValue    String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
