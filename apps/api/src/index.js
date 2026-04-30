@@ -9,12 +9,21 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
-  .split(',')
-  .map(origin => origin.trim())
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'https://fredocloudweb-production.up.railway.app'
+];
+const allowedOrigins = [
+  ...defaultAllowedOrigins,
+  ...(process.env.CLIENT_URL || '').split(',')
+]
+  .map(origin => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
+const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
 const corsOrigin = (origin, callback) => {
-  if (!origin || allowedOrigins.includes(origin)) {
+  const normalizedOrigin = origin?.replace(/\/$/, '');
+
+  if (!normalizedOrigin || uniqueAllowedOrigins.includes(normalizedOrigin)) {
     return callback(null, true);
   }
 
@@ -28,6 +37,12 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors({
+  origin: corsOrigin,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,7 +50,7 @@ app.use(cookieParser());
 // Socket.io setup
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins,
+    origin: uniqueAllowedOrigins,
     credentials: true
   }
 });
