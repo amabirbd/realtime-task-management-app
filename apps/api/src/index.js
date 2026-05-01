@@ -106,7 +106,8 @@ app.use((err, req, res, next) => {
 // Socket.io connection handler
 require('./sockets')(io);
 
-const PORT = process.env.PORT || 4000;
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const PORT = parseInt(process.env.PORT, 10) || 4000;
+httpServer.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on 0.0.0.0:${PORT}`);
+  console.log(`Allowed CORS origins: ${uniqueAllowedOrigins.join(', ')}`);
 });
