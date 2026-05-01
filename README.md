@@ -4,14 +4,14 @@ A full-stack team collaboration platform built with Next.js 14, Express.js, Post
 
 ## 🚀 Live Demo
 
-- **Frontend:** [https://your-frontend.railway.app](https://your-frontend.railway.app)
-- **API:** [https://your-api.railway.app](https://your-api.railway.app)
-- **API Docs:** [https://your-api.railway.app/api/docs](https://your-api.railway.app/api/docs)
+- **Live App:** [https://fredocloudweb-production.up.railway.app](https://fredocloudweb-production.up.railway.app)
+- **API:** [https://fredocloudapi-production.up.railway.app](https://fredocloudapi-production.up.railway.app)
+- **API Docs:** [https://fredocloudapi-production.up.railway.app/api/docs](https://fredocloudapi-production.up.railway.app/api/docs)
 
 **Demo Accounts:**
 - `demo@fredocloud.com` / `demo123`
 - `admin@fredocloud.com` / `demo123`
-- `teammate@fredocloud.com` / `demo123`
+- `teammember@fredocloud.com` / `demo123`
 
 ## 📁 Project Structure
 
@@ -160,62 +160,6 @@ cd apps/web && npm run dev
 - API: http://localhost:4000
 - API Docs: http://localhost:4000/api/docs
 
-## 🚂 Deployment (Railway)
-
-### Setup
-
-1. **Create a Railway project:**
-   - Go to [Railway.app](https://railway.app)
-   - Create a new project
-
-2. **Add PostgreSQL:**
-   - Add the PostgreSQL plugin
-   - This automatically sets `DATABASE_URL`
-
-3. **Deploy Backend:**
-   - Add a new service from your GitHub repo
-   - Set the root directory to `apps/api`
-   - Railway will use `apps/api/railway.json`
-   - Build command: `npm install && npm run build`
-   - Start command: `npm start`
-   - Pre-deploy command: `npm run deploy:db --workspace=@fredocloud/api`
-   - Add environment variables:
-     - `DATABASE_URL` - from the Railway PostgreSQL plugin
-     - `JWT_ACCESS_SECRET` - generate a random string
-     - `JWT_REFRESH_SECRET` - generate a different random string
-     - `CLOUDINARY_CLOUD_NAME`
-     - `CLOUDINARY_API_KEY`
-     - `CLOUDINARY_API_SECRET`
-     - `CLIENT_URL` - your frontend URL
-     - `NODE_ENV` - `production`
-
-4. **Deploy Frontend:**
-   - Add another service from the same repo
-   - Set the root directory to `apps/web`
-   - Railway will use `apps/web/railway.json`
-   - Build command: `npm install && npm run build`
-   - Start command: `npm start`
-   - Add environment variables:
-     - `NEXT_PUBLIC_API_URL` - your backend URL + `/api/v1`
-     - `NEXT_PUBLIC_SOCKET_URL` - your backend URL
-
-5. **Seed the database:**
-   ```bash
-   railway run --service api npm run deploy:db --workspace=@fredocloud/api
-   ```
-
-6. **Update production URLs after both services deploy:**
-   - Backend `CLIENT_URL` must exactly match the frontend Railway URL
-   - Frontend `NEXT_PUBLIC_API_URL` must be `https://your-api.railway.app/api/v1`
-   - Frontend `NEXT_PUBLIC_SOCKET_URL` must be `https://your-api.railway.app`
-   - Redeploy both services after changing environment variables
-
-7. **Verify deployment:**
-   - API health: `https://your-api.railway.app/health`
-   - API docs: `https://your-api.railway.app/api/docs`
-   - Frontend: `https://your-frontend.railway.app`
-   - Test login, realtime updates, and Workspace Docs collaboration
-
 ## 🔐 Authentication
 
 The app uses JWT tokens stored in httpOnly cookies:
@@ -294,21 +238,10 @@ The app uses JWT tokens stored in httpOnly cookies:
 - **shadcn/ui patterns:** Component structure inspired by shadcn but built manually
 - **Server-side auth:** JWT in httpOnly cookies for security
 
-## 📝 Conventional Commits
-
-This project uses conventional commits:
-- `feat:` New features
-- `fix:` Bug fixes
-- `docs:` Documentation changes
-- `style:` Code style changes (formatting, etc.)
-- `refactor:` Code refactoring
-- `test:` Test changes
-- `chore:` Build process, dependencies, etc.
 
 ## ⚠️ Known Limitations
 
 - Email notifications require SMTP configuration
-- Collaborative editing is basic (operational transformation not implemented)
 - Offline support is not implemented
 - PWA features not implemented
 - No automated tests (would add with more time)
