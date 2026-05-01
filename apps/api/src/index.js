@@ -94,6 +94,7 @@ app.use('/api/v1/notifications', require('./routes/notifications'));
 
 // Swagger docs
 app.use('/api/docs', require('./routes/docs'));
+app.use('/docs', require('./routes/docs'));
 
 // Error handler
 app.use((err, req, res, next) => {
