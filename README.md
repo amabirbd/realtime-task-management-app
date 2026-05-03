@@ -79,12 +79,13 @@ fredocloud/
 - ✅ **Goals & Milestones:** Create goals with milestones and progress tracking
 - ✅ **Announcements:** Rich-text posts with reactions and comments
 - ✅ **Action Items:** Kanban board and list views, priority levels
+- ✅ **Workspace Docs:** Real-time collaborative document editing with live cursors
 - ✅ **Real-time Updates:** Live updates via Socket.io
 - ✅ **Analytics Dashboard:** Stats and charts (Recharts)
 - ✅ **CSV Export:** Export workspace data
 
 ### Advanced Features (Implemented)
-1. **Real-time Collaborative Editing:** Multiple users can edit goal descriptions simultaneously with live cursors (using Socket.io)
+1. **Real-time Workspace Docs Collaboration:** Multiple users can edit workspace documents simultaneously with live cursors, user presence, and document sync events using Socket.io
 2. **Optimistic UI:** Actions reflect instantly before server confirmation, with graceful rollback on error
 
 ### Bonus Features (Implemented)
@@ -220,10 +221,12 @@ The app uses JWT tokens stored in httpOnly cookies:
 
 ## 🎯 Advanced Features Implemented
 
-### 1. Real-time Collaborative Editing
-- Uses Socket.io to sync goal descriptions in real-time
-- Live cursors show where other users are editing
-- Document rooms are isolated per goal
+### 1. Real-time Workspace Docs Collaboration
+- Uses Socket.io to sync workspace document edits in real-time
+- Live colored cursors show which teammate is editing and where they are typing
+- User presence shows active editors inside a document
+- Document rooms are isolated per workspace document
+- Sync request/response events keep late joiners aligned with the latest content
 
 ### 2. Optimistic UI
 - All mutations show immediate feedback
